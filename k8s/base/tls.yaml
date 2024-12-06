@@ -1,0 +1,18 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: affine-tls
+  namespace: affine
+spec:
+  secretName: affine-tls
+  dnsNames:
+    - affine.tunnel.threadr.ai
+  issuerRef:
+    name: threadr-issuer
+    kind: ClusterIssuer
+  duration: 2160h # 90 days
+  renewBefore: 360h # 15 days
+  usages:
+    - digital signature
+    - key encipherment
+    - server auth

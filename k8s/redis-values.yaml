@@ -1,0 +1,20 @@
+architecture: standalone
+
+auth:
+  enabled: true
+  password: "" # Will be auto-generated if not set
+
+master:
+  persistence:
+    enabled: true
+    storageClass: "local-path"
+    size: 8Gi
+
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+
+service:
+  type: ClusterIP
+  port: 6379

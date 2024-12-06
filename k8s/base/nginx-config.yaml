@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: affine-nginx-conf
+  namespace: affine
+data:
+  nginx.conf: |
+    events {
+      worker_connections 1024;
+    }
+    http {
+      include /etc/nginx/mime.types;
+
+      server {
+        listen 80;
+    
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    
+        location / {
+          proxy_pass http://affine-web:8080;
+        }
+
+        location /socket.io/ {
+          proxy_pass http://affine-sync:3010;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection "upgrade";
+          proxy_buffering off;
+        }
+
+        location /api/worker/ {
+          add_header Access-Control-Allow-Origin $http_origin always;
+          add_header Access-Control-Allow-Methods 'GET, OPTIONS' always;
+          add_header Access-Control-Allow-Headers '*' always;
+          proxy_pass https://affine-worker.toeverything.workers.dev;
+          proxy_set_header Referer 'https://affine.pro';
+          proxy_set_header Origin 'https://affine.pro';
+          proxy_ssl_server_name on;
+        }
+
+        location /assets/ {
+          add_header Access-Control-Allow-Origin $http_origin always;
+          add_header Access-Control-Allow-Methods 'GET, OPTIONS' always;
+          add_header Access-Control-Allow-Headers '*' always;
+          proxy_pass https://dev.affineassets.com;
+          proxy_ssl_server_name on;
+        }
+      }
+    }

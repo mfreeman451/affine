@@ -1,0 +1,105 @@
+# Original values file with updated CORS settings
+global:
+  app:
+    buildType: 'stable'
+    env:
+      AFFINE_ENV: production
+      AFFINE_SERVER_HOST: 'affine.tunnel.threadr.ai'
+  ingress:
+    enabled: true
+    annotations:
+      cert-manager.io/cluster-issuer: "threadr-issuer"
+      external-dns.alpha.kubernetes.io/hostname: "affine.tunnel.threadr.ai"
+      metallb.universe.tf/allow-shared-ip: "true"
+      metallb.universe.tf/address-pool: k3s-pool
+      nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/websocket-services: "affine-sync"
+      nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
+    className: 'nginx'
+    host: affine.tunnel.threadr.ai
+    tls:
+      - hosts:
+          - affine.tunnel.threadr.ai
+        secretName: affine-tls
+  secret:
+    secretName: 'affine-server-private-key'
+    privateKey: ''
+  database:
+    user: 'affine'
+    url: 'cluster-pg-rw.cnpg-system'
+    port: '5432'
+    name: 'affine'
+    password: ''
+    gcloud:
+      enabled: false
+  redis:
+    enabled: true
+    host: 'affine-redis-master'
+    port: '6379'
+    password: ''
+    database: 0
+  objectStorage:
+    r2:
+      enabled: false
+  gke:
+    enabled: false
+
+graphql:
+  resources:
+    limits:
+      cpu: "4"
+      memory: 4Gi
+    requests:
+      cpu: "2"
+      memory: 2Gi
+  env: 'production'
+  app:
+    env:
+      AFFINE_ENV: production
+  image:
+    repository: ghcr.io/toeverything/affine-graphql
+    tag: canary-0c71892  # Updated to latest canary tag
+  service:
+    type: ClusterIP
+    port: 3000
+    annotations: {}
+
+renderer:
+  resources:
+    limits:
+      cpu: "4"
+      memory: 4Gi
+    requests:
+      cpu: "2"
+      memory: 2Gi
+  image:
+    repository: ghcr.io/toeverything/affine-graphql
+    tag: canary-0c71892  # Updated to latest canary tag
+  service:
+    type: ClusterIP
+    port: 3000
+    annotations: {}
+
+sync:
+  env: 'production'
+  app:
+    env:
+      AFFINE_ENV: production
+  image:
+    repository: ghcr.io/toeverything/affine-graphql
+    tag: canary-0c71892  # Updated to latest canary tag
+  service:
+    type: ClusterIP
+    port: 3010
+    annotations: {}
+
+web:
+  image:
+    repository: ghcr.io/toeverything/affine-front
+    tag: canary-0c71892  # Should check if this tag exists for front image
+  service:
+    type: ClusterIP
+    port: 8080
